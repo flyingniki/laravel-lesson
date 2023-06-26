@@ -17,10 +17,12 @@ class PostController extends Controller
         $posts = Post::all();
         // dump($posts);
 
-        $posts = Post::where('is_published', 1)->get();
-        foreach ($posts as $post) {
-            dump($post->title);
-        }
+        // $posts = Post::where('is_published', 1)->get();
+        // foreach ($posts as $post) {
+        //     dump($post->title);
+        // }
+
+        return view('posts', compact('posts'));
     }
 
     public function create()
@@ -51,9 +53,9 @@ class PostController extends Controller
         // ]);
         // dd('created');
 
-        foreach ($postsArr as $item) {
-            Post::create($item);
-            dd('created');
+        foreach ($postsArr as $post) {
+            Post::create($post);
+            dump('created');
         }
     }
 
@@ -81,5 +83,41 @@ class PostController extends Controller
         $post = Post::withTrashed()->find(4);
         $post->restore();
         dd('restored');
+    }
+
+    public function firstOrCreate()
+    {
+        $anothetPost = [
+            'title' => 'another of posts',
+            'content' => 'another some content',
+            'image' => 'another_image.jpg',
+            'likes' => '50',
+            'is_published' => '1',
+        ];
+
+        $post = Post::firstOrCreate([
+            'title' => 'title of php',
+        ], $anothetPost);
+
+        dump($post->content);
+        dd('firstOrCreate');
+    }
+
+    public function updateOrCreate()
+    {
+        $anothetPost = [
+            'title' => 'third type of posts',
+            'content' => 'third of some content',
+            'image' => 'another_image.jpg',
+            'likes' => '50',
+            'is_published' => '1',
+        ];
+
+        $post = Post::updateOrCreate([
+            'title' => 'title of posts',
+        ], $anothetPost);
+
+        dump($post->content);
+        dd('firstOrCreate');
     }
 }
