@@ -9,66 +9,47 @@ class PostController extends Controller
 {
     public function index()
     {
-        // return 'this is my page';
-        // $str = 'string';
-        // dd($str);
         $post = Post::find(1);
-        // dump($post);
         $posts = Post::all();
-        // dump($posts);
 
-        // $posts = Post::where('is_published', 1)->get();
-        // foreach ($posts as $post) {
-        //     dump($post->title);
-        // }
-
-        return view('posts', compact('posts'));
+        return view('post.index', compact('posts'));
     }
 
     public function create()
     {
-        $postsArr = [
-            [
-                'title' => 'title of posts',
-                'content' => 'some content',
-                'image' => 'image.jpg',
-                'likes' => '20',
-                'is_published' => '1',
-            ],
-            [
-                'title' => 'another of posts',
-                'content' => 'another some content',
-                'image' => 'another_image.jpg',
-                'likes' => '50',
-                'is_published' => '1',
-            ],
-        ];
-
-        // Post::create([
-        //     'title' => 'title of posts',
-        //     'content' => 'some content',
-        //     'image' => 'image.jpg',
-        //     'likes' => '20',
-        //     'is_published' => '1',
-        // ]);
-        // dd('created');
-
-        foreach ($postsArr as $post) {
-            Post::create($post);
-            dump('created');
-        }
+        return view('post.create');
     }
 
-    public function update()
+    public function store()
     {
-        $post = Post::find(5);
-
-        $post->update([
-            'title' => 'updated',
-            'image' => 'updated'
+        $data = request()->validate([
+            'title' => 'string',
+            'content' => 'string',
+            'image' => 'string'
         ]);
+        Post::create($data);
+        return redirect()->route('post.index');
+    }
 
-        dd('updated');
+    public function show(Post $post)
+    {
+        return view('post.show', compact('post'));
+    }
+
+    public function edit(Post $post)
+    {
+        return view('post.edit', compact('post'));
+    }
+
+    public function update(Post $post)
+    {
+        $data = request()->validate([
+            'title' => 'string',
+            'content' => 'string',
+            'image' => 'string'
+        ]);
+        $post->update($data);
+        return redirect()->route('post.show', $post->id);
     }
 
     public function delete()
@@ -76,6 +57,12 @@ class PostController extends Controller
         $post = Post::find(4);
         $post->delete();
         dd('deleted');
+    }
+
+    public function destroy(Post $post)
+    {
+        $post->delete();
+        return redirect()->route('post.index');
     }
 
     public function restore()
