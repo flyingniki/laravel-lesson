@@ -2,32 +2,52 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Post;
+use App\Models\PostTag;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
     public function index()
     {
-        $post = Post::find(1);
         $posts = Post::all();
+        // $tag = Tag::find(1);
+        // $category = Category::find(1);
+        // $posts = Post::where('category_id', $category->id)->get();
+        // dd($tag->posts);
 
         return view('post.index', compact('posts'));
     }
 
     public function create()
     {
-        return view('post.create');
+        $categories = Category::all();
+        $tags = Tag::all();
+        return view('post.create', compact('categories', 'tags'));
     }
 
     public function store()
     {
         $data = request()->validate([
-            'title' => 'string',
+            'title' => 'required|string',
             'content' => 'string',
-            'image' => 'string'
+            'image' => 'string',
+            'category_id' => '',
+            'tags' => ''
         ]);
-        Post::create($data);
+        $tags = $data['tags'];
+        unset($data['tags']);
+        // dd($tags, $data);
+        $post = Post::create($data);
+        // foreach ($tags as $tag) {
+        //     PostTag::firstOrCreate([
+        //         'tag_id' => $tag,
+        //         'post_id' => $post->id
+        //     ]);
+        // }
+        $post->tags()->attach($tags);
         return redirect()->route('post.index');
     }
 
@@ -38,7 +58,9 @@ class PostController extends Controller
 
     public function edit(Post $post)
     {
-        return view('post.edit', compact('post'));
+        $tags = Tag::all();
+        $categories = Category::all();
+        return view('post.edit', compact('post', 'categories', 'tags'));
     }
 
     public function update(Post $post)
@@ -46,9 +68,15 @@ class PostController extends Controller
         $data = request()->validate([
             'title' => 'string',
             'content' => 'string',
-            'image' => 'string'
+            'image' => 'string',
+            'category_id' => '',
+            'tags' => ''
         ]);
+        $tags = $data['tags'];
+        unset($data['tags']);
         $post->update($data);
+        $post = $post->fresh();
+        $post->tags()->sync($tags);
         return redirect()->route('post.show', $post->id);
     }
 
