@@ -12,13 +12,13 @@ class PostController extends Controller
 {
     public function index()
     {
-        $post = Post::find(1);
+        $posts = Post::all();
         // $tag = Tag::find(1);
-        $category = Category::find(1);
+        // $category = Category::all(1);
         // $posts = Post::where('category_id', $category->id)->get();
         // dd($tag->posts);
-        $tag = Tag::find(1);
-        dd($post->tags);
+        // $tag = Tag::find(1);
+        // dd($post->tags);
 
         return view('post.index', compact('posts'));
     }
